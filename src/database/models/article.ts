@@ -40,25 +40,9 @@ const schema = new Schema<DocType, IModel>({
 // The loadClass() function lets you pull in methods, statics, and virtuals from an ES6 class. 
 schema.loadClass(Article);
 
-const ArticleModel = model('Tank', schema);
+const ArticleModel = model('article', schema);
 
 // let Tank = mongoose.model('Tank');
-
-// console.log(Tank)
-
-
-
-/* 
-
-let tank = new Tank();
-
-tank.title = ""; */
-
-// console.log(tank);
-// console.log(Tank === mongoose.model('Tank'))
-// console.log()
-// console.log(tank.myVirtual)
-// console.log(tank.myMethod());
 
 export default ArticleModel;
 
