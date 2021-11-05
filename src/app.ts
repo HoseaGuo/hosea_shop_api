@@ -2,6 +2,7 @@ import Koa from 'koa';
 import koaBody from 'koa-body';
 import router from './router/v1';
 import databaseConnect from './database/connect';
+import responseMiddleware from './middleware/response'
 
 
 const SERVER_PORT = 9925;
@@ -13,9 +14,11 @@ function createApp() {
   // 连接数据库1
   databaseConnect();
   
+  // 添加响应方法中间件
+  app.use(responseMiddleware);
+
   app.use(router.routes())
     .use(router.allowedMethods());
-
 
   app.listen(SERVER_PORT);
 

@@ -2,7 +2,9 @@ import Router from '@koa/router';
 // import ArticleModels from '../database/models/article'; 
 import articleController from '../controller/article'
 
-const router = new Router();
+const router = new Router({
+  prefix: '/v1'
+});
 
 // 搜索
 router.get('/article', articleController.search);

@@ -8,13 +8,14 @@ export async function search(ctx: Context , next: Next){
 
 export async function create(ctx: Context , next: Next){
   // console.log(ctx.request.body)
-  let article = new ArticleModel(ctx.request.body);
+  // let article = new ArticleModel(ctx.request.body);
 
-  let doc = await article.save();
+  // let doc = await article.save();
 
-  console.log(doc);
+  // console.log(doc);
 
-  ctx.body = "create"
+  // ctx.body = "create"
+  ctx.success("aaaa")
 }
 
 export async function edit(ctx: Context , next: Next){
