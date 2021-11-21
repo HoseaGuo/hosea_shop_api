@@ -11,8 +11,8 @@ interface IResponseBody {
   msg?: any;
 }
 
-export default function (ctx: Context, next: Next) {
-  ctx.success = function (data: any , msg: string) {
+export default async function (ctx: Context, next: Next) {
+  ctx.success = function (data: any, msg: string) {
     let body: IResponseBody = {
       code: 0,
       status: 200,
@@ -39,5 +39,6 @@ export default function (ctx: Context, next: Next) {
     ctx.status = body.status as number;
   }
 
-  next();
+  // 中间件也要 使用await next()， 否则之后要使用await的话，会不成功。
+  await next();
 }
