@@ -12,16 +12,16 @@ interface IResponseBody {
 }
 
 export default function (ctx: Context, next: Next) {
-  ctx.success = function (data: any , msg: string) {
+  ctx.success = function (data: any, msg: string) {
     let body: IResponseBody = {
       code: 0,
       status: 200,
       data,
-      msg: msg || "请求成功"
-    }
+      msg: msg || "请求成功",
+    };
     ctx.body = body;
     ctx.status = body.status as number;
-  }
+  };
 
   ctx.fail = function (body: IResponseBody) {
     if (!body.code) {
@@ -32,12 +32,12 @@ export default function (ctx: Context, next: Next) {
       body.status = 400;
     }
 
-    if (typeof body.msg !== 'string') {
-      body.msg = "请求出错"
+    if (typeof body.msg !== "string") {
+      body.msg = "请求出错";
     }
     ctx.body = body;
     ctx.status = body.status as number;
-  }
+  };
 
-  next();
+  return next();
 }
