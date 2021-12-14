@@ -15,7 +15,7 @@ function createApp() {
     })
   );
 
-  // 连接数据库1
+  // 连接数据库
   databaseConnect();
 
   // 添加响应方法中间件

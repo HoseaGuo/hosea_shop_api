@@ -8,8 +8,9 @@
   "execMap": {
     "js": "node --harmony"
   },
-  "events": {
-    
-  },
-  "ext": "js,json,ts"
+  "watch": [
+    "src/"
+  ],
+  "events": {},
+  "ext": "ts"
 }
