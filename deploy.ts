@@ -117,7 +117,7 @@ async function restartServer() {
 
     // 重启pm2项目 api.hosea.com
     console.log("重启pm2服务")
-    await runCommand(`pm2 restart aip.hosea.com`, `${webDir}/api`);
+    await runCommand(`pm2 restart api.hosea.com`, `${webDir}/api`);
     console.log("重启pm2结束")
 
     ssh.dispose(); //断开连接

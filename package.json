@@ -20,16 +20,18 @@
     "koa-body": "^4.2.0",
     "mongodb": "^4.1.2",
     "mongoose": "^6.0.7",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "koa2-cors": "^2.0.6"
   },
   "devDependencies": {
     "@swc/core": "^1.2.111",
     "@swc/helpers": "^0.2.14",
     "@types/koa": "^2.13.4",
-    "@types/node": "^16.9.6",
+    "@types/koa2-cors": "^2.0.2",
     "@types/koa__router": "^8.0.8",
-    "concurrently": "^6.4.0",
+    "@types/node": "^16.9.6",
     "compressing": "^1.5.1",
+    "concurrently": "^6.4.0",
     "node-ssh": "^12.0.2",
     "nodemon": "^2.0.13",
     "regenerator-runtime": "^0.13.9",
