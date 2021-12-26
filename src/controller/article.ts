@@ -20,16 +20,18 @@ export async function search(ctx: Context, next: Next) {
 }
 
 export async function create(ctx: Context, next: Next) {
-  console.log(ctx.request.body);
+  // console.log(ctx.request.body);
   let article = new ArticleModel(ctx.request.body);
 
-  let doc = await article.save();
-
-  console.log(doc);
-
-  if (doc) {
-    ctx.success(doc, "文章创建成功");
-  } else {
+  try {
+    let doc = await article.save();
+    if (doc) {
+      ctx.success(doc, "文章创建成功");
+    } else {
+      ctx.fail("文章创建失败");
+    }
+  } catch (err) {
+    // console.log(err);
     ctx.fail("文章创建失败");
   }
 }

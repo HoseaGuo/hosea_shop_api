@@ -1,6 +1,6 @@
 import { Next, Context } from "koa";
 
-interface IResponseBody {
+interface IResponse {
   /** 响应状态 */
   status?: number;
   /** 业务自定义状态码 */
@@ -12,31 +12,33 @@ interface IResponseBody {
 }
 
 export default function (ctx: Context, next: Next) {
-  ctx.success = function (data: any, msg: string) {
-    let body: IResponseBody = {
+  ctx.success = function (data?: any, msg?: string) {
+    let body: IResponse = {
       code: 0,
-      status: 200,
       data,
       msg: msg || "请求成功",
     };
     ctx.body = body;
-    ctx.status = body.status as number;
+    ctx.status = 200;
   };
 
-  ctx.fail = function (body: IResponseBody) {
-    if (!body.code) {
-      body.code = 1;
+  ctx.fail = function (error: IResponse | string) {
+    if (typeof error === "string") {
+      ctx.body = {
+        code: 1,
+        msg: error,
+      };
+      ctx.status = 400;
+    } else {
+      if (error.status === 200 || !error.status) {
+        error.status = 400;
+      }
+      if (typeof error.msg !== "string") {
+        error.msg = "请求出错";
+      }
+      ctx.body = error;
+      ctx.status = error.status;
     }
-
-    if (body.status === 200 || !body.status) {
-      body.status = 400;
-    }
-
-    if (typeof body.msg !== "string") {
-      body.msg = "请求出错";
-    }
-    ctx.body = body;
-    ctx.status = body.status as number;
   };
 
   return next();
