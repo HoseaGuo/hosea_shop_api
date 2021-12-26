@@ -3,7 +3,7 @@ import updatePlugin from './plugins/update';
 
 
 const PORT = 8888;
-const DATABASE_NAME = 'hair';
+const DATABASE_NAME = 'hosea';
 
 async function connect() {
   // connection Events
@@ -15,8 +15,9 @@ async function connect() {
   mongoose.plugin(updatePlugin);
 
   try {
-    await mongoose.connect(`mongodb://localhost:${PORT}/${DATABASE_NAME}`, { autoIndex: false });
+    await mongoose.connect(`mongodb://127.0.0.1:${PORT}/${DATABASE_NAME}`, { autoIndex: false });
   } catch (error) {
+    console.log(error)
     console.log('mongodb数据库连接失败，或者是由于mongodb数据库还没有启动！');
   }
 
