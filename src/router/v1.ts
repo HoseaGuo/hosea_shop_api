@@ -1,6 +1,7 @@
 import Router from "@koa/router";
 import articleController from "../controller/article";
 import userController from "../controller/user";
+import menuController from "../controller/menu";
 
 const router = new Router({
   prefix: "/v1",
@@ -26,8 +27,10 @@ router.delete('/user', userController.remove);
 router.post('/user/login', userController.login);
 router.post('/user/check-login', userController.checkLogin);
 
-/* router.get("/search", async (ctx: any) => {
-  ctx.body = "xxx";
-}); */
+/* 目录 */
+router.get('/menu', menuController.search);
+router.post('/menu', menuController.create);
+// router.put('/menu', menuController.edit);
+router.delete('/menu', menuController.remove);
 
 export default router;

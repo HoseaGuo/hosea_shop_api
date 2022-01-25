@@ -4,6 +4,7 @@ import { sign, verify } from '../utils/jwt';
 import crypto from 'crypto';   // 加密用的
 import rand from "csprng";  // 生成随机数用的
 import userModel from "../database/models/user";
+import { verifyToken } from '../middleware/auth'
 
 const NAME = "用户";
 
@@ -43,11 +44,22 @@ export async function search(ctx: Context, next: Next) {
 
   let docs;
 
+  let res = verifyToken(ctx);
+
+  let query: any;
+
   if (_id) {
-    docs = await UserModel.findById(_id);
+    query = UserModel.findById(_id);
+    // docs = await UserModel.findById(_id).where("username").nin(["admin"]);
   } else {
-    docs = await UserModel.find();
+    query = UserModel.find();
   }
+
+  // 如果不是超级管理员[admin]，则不能查询到admin
+  if (res.data?.username !== 'admin') {
+    query.where("username").nin(["admin"]);
+  }
+  docs = await query.exec();
 
   if (docs) {
     ctx.success(docs, `${NAME}查询成功`);
@@ -104,7 +116,8 @@ export async function login(ctx: Context, next: Next) {
 
       // 将token保存到header返回给前端。
       const token = sign({
-        _id: rest._id
+        _id: rest._id,
+        username: rest.username
       })
 
       // 设置token到响应头中
