@@ -30,14 +30,15 @@ export default function (ctx: Context, next: Next) {
       };
       ctx.status = 400;
     } else {
-      if (error.status === 200 || !error.status) {
-        error.status = 400;
+      let { status, ...rest } = error;
+      if (status === 200 || !status) {
+        status = 400;
       }
-      if (typeof error.msg !== "string") {
-        error.msg = "请求出错";
+      if (typeof rest.msg !== "string") {
+        rest.msg = "请求出错";
       }
-      ctx.body = error;
-      ctx.status = error.status;
+      ctx.body = rest;
+      ctx.status = status;
     }
   };
 

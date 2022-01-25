@@ -1,6 +1,6 @@
 import Router from "@koa/router";
-// import ArticleModels from '../database/models/article';
 import articleController from "../controller/article";
+import userController from "../controller/user";
 
 const router = new Router({
   prefix: "/v1",
@@ -18,8 +18,16 @@ router.put("/article", articleController.edit);
 // 删除
 router.delete("/article", articleController.remove);
 
-router.get("/search", async (ctx: any) => {
+/* 用户 */
+router.get('/user', userController.search);
+router.post('/user', userController.create);
+// router.put('/user', userController.edit);
+router.delete('/user', userController.remove);
+router.post('/user/login', userController.login);
+router.post('/user/check-login', userController.checkLogin);
+
+/* router.get("/search", async (ctx: any) => {
   ctx.body = "xxx";
-});
+}); */
 
 export default router;

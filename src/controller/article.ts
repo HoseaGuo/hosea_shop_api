@@ -2,6 +2,7 @@ import { Context, Next } from "koa";
 import ArticleModel from "../database/models/article";
 
 export async function search(ctx: Context, next: Next) {
+
   let { _id } = ctx.request.query;
 
   let docs;

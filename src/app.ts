@@ -4,6 +4,7 @@ import cors from 'koa2-cors';
 import router from "./router/v1";
 import databaseConnect from "./database/connect";
 import responseMiddleware from "./middleware/response";
+import authMiddleware from "./middleware/auth";
 
 const SERVER_PORT = 9925;
 
@@ -34,6 +35,7 @@ function createApp() {
 
   // 添加响应方法中间件
   app.use(responseMiddleware);
+  app.use(authMiddleware);
 
   app.use(router.routes()).use(router.allowedMethods());
   // app.use((ctx, next) => {

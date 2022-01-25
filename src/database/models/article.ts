@@ -28,7 +28,8 @@ interface TVirtuals {
 }
 
 interface IModel extends Model<DocType, TQueryHelpers, TMethods, TVirtuals> {
-  myStatic(): number;
+  // myStatic(): number;
+  haha: number;
 }
 
 // 2. Create a Schema corresponding to the document interface.
