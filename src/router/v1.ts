@@ -30,7 +30,7 @@ router.post('/user/check-login', userController.checkLogin);
 /* 目录 */
 router.get('/menu', menuController.search);
 router.post('/menu', menuController.create);
-// router.put('/menu', menuController.edit);
+router.put('/menu', menuController.edit);
 router.delete('/menu', menuController.remove);
 
 export default router;

@@ -44,19 +44,18 @@ export async function search(ctx: Context, next: Next) {
 
 /* 修改 */
 export async function edit(ctx: Context, next: Next) {
-  let { _id, content, title } = ctx.request.body;
-
-  let res = await MenuModel.updateOne({
-    _id,
-    title,
-    content,
-  });
-
-  if (res.matchedCount) {
-    ctx.success(null, `${NAME}修改成功`);
-  } else {
+  let { _id, ...rest } = ctx.request.body;
+  try {
+    let res = await MenuModel.findByIdAndUpdate(_id, rest);
+    if (res) {
+      ctx.success(null, `${NAME}修改成功`);
+    } else {
+      ctx.fail(`${NAME}修改失败`);
+    }
+  } catch (e) {
     ctx.fail(`${NAME}修改失败`);
   }
+
 }
 
 /* 删除 */

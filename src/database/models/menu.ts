@@ -19,7 +19,7 @@ const schema = new Schema<DocType>({
   name: { type: String, required: true, trim: true },
   path: { type: String, required: true, trim: true },
   index: { type: Number, default: 0 },
-  parentId: { type: String, default: "-1" }
+  parentId: { type: String, default: "0" } // "0" 表示一级目录
 }, { timestamps: {} });
 
 const menuModel = model(MODEL_NAME, schema);
