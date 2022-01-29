@@ -45,16 +45,16 @@ export async function create(ctx: Context, next: Next) {
 export async function search(ctx: Context, next: Next) {
   let { _id } = ctx.request.query;
 
-  let docs;
+  let searchRes;
 
-  let res = verifyToken(ctx);
+  // let res = verifyToken(ctx);
 
-  let query: any;
+  // let query: any;
 
   if (_id) {
-    docs = await UserModel.findById(_id);
+    searchRes = await UserModel.findById(_id);
   } else {
-    docs = await pagingQuery(UserModel, {
+    searchRes = await pagingQuery(UserModel, {
       // $where: function () {
       //   return this.username !== "admin";
       // },
@@ -62,16 +62,14 @@ export async function search(ctx: Context, next: Next) {
     });
   }
 
-  console.log(docs);
-
   // 如果不是超级管理员[admin]，则不能查询到admin
   // if (res.data?.username !== "admin") {
   //   query.where("username").nin(["admin"]);
   // }
   // docs = await query.exec();
 
-  if (docs) {
-    ctx.success(docs, `${NAME}查询成功`);
+  if (searchRes) {
+    ctx.success(searchRes, `${NAME}查询成功`);
   } else {
     ctx.fail(`${NAME}查询失败`);
   }

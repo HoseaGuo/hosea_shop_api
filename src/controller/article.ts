@@ -5,16 +5,16 @@ import { pagingQuery } from "../utils";
 export async function search(ctx: Context, next: Next) {
   let { _id } = ctx.request.query;
 
-  let docs;
+  let searchRes;
 
   if (_id) {
-    docs = await ArticleModel.findById(_id);
+    searchRes = await ArticleModel.findById(_id);
   } else {
-    docs = await pagingQuery(ArticleModel, ctx.request.query);
+    searchRes = await pagingQuery(ArticleModel, ctx.request.query);
   }
 
-  if (docs) {
-    ctx.success(docs);
+  if (searchRes) {
+    ctx.success(searchRes);
   } else {
     ctx.fail("搜索失败");
   }

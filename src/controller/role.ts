@@ -24,20 +24,18 @@ export async function create(ctx: Context, next: Next) {
 export async function search(ctx: Context, next: Next) {
   let { _id } = ctx.request.query;
 
-  let docs;
-
-  let query: any;
+  let searchRes;
 
   if (_id) {
-    docs = await RoleModel.findById(_id);
+    searchRes = await RoleModel.findById(_id);
   } else {
     // query = RoleModel.find();
-    docs = await pagingQuery(RoleModel, ctx.request.query);
+    searchRes = await pagingQuery(RoleModel, ctx.request.query);
     //
   }
 
-  if (docs) {
-    ctx.success(docs, `${NAME}查询成功`);
+  if (searchRes) {
+    ctx.success(searchRes, `${NAME}查询成功`);
   } else {
     ctx.fail(`${NAME}查询失败`);
   }
