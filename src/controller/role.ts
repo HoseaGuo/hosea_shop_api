@@ -1,11 +1,12 @@
 import { Context, Next } from "koa";
-import MenuModel from "../database/models/menu";
+import RoleModel from "../database/models/role";
+import { pagingQuery } from "../utils";
 
-const NAME = "目录";
+const NAME = "角色";
 
 /* 新增 */
 export async function create(ctx: Context, next: Next) {
-  let menu = new MenuModel(ctx.request.body);
+  let menu = new RoleModel(ctx.request.body);
   try {
     let doc = await menu.save();
     if (doc) {
@@ -28,12 +29,12 @@ export async function search(ctx: Context, next: Next) {
   let query: any;
 
   if (_id) {
-    query = MenuModel.findById(_id);
+    docs = await RoleModel.findById(_id);
   } else {
-    query = MenuModel.find();
+    // query = RoleModel.find();
+    docs = await pagingQuery(RoleModel, ctx.request.query);
+    //
   }
-
-  docs = await query.exec();
 
   if (docs) {
     ctx.success(docs, `${NAME}查询成功`);
@@ -46,7 +47,7 @@ export async function search(ctx: Context, next: Next) {
 export async function edit(ctx: Context, next: Next) {
   let { _id, ...rest } = ctx.request.body;
   try {
-    let res = await MenuModel.findByIdAndUpdate(_id, rest);
+    let res = await RoleModel.findByIdAndUpdate(_id, rest);
     if (res) {
       ctx.success(null, `${NAME}修改成功`);
     } else {
@@ -55,35 +56,21 @@ export async function edit(ctx: Context, next: Next) {
   } catch (e) {
     ctx.fail(`${NAME}修改失败`);
   }
-
-}
-
-async function deleteTreeById(id: string) {
-  // 找到所有子目录
-  let docs = await MenuModel.find({ parentId: id });
-
-  // 递归删除所有子目录
-  await Promise.allSettled(docs.map((doc: any) => deleteTreeById(doc._id)))
-
-  // 删除本身
-  await MenuModel.findByIdAndDelete(id);
 }
 
 /* 删除 */
 export async function remove(ctx: Context, next: Next) {
   let { _id } = ctx.request.body;
-
+  console.log(_id);
   try {
-    let doc = await MenuModel.findById(_id);
-
+    let doc = await RoleModel.findByIdAndDelete(_id);
     if (doc) {
-      await deleteTreeById(doc._id);
-      ctx.success(null, `${NAME}删除成功`)
+      ctx.success(null, `${NAME}删除成功`);
     } else {
       ctx.fail(`没有找到该${NAME}`);
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     ctx.fail(`${NAME}删除失败`);
   }
 }

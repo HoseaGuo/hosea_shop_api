@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Model, Types } from 'mongoose';
+import mongoose, { Schema, model, Model, Types } from "mongoose";
 
 const MODEL_NAME = "menu";
 
@@ -10,17 +10,19 @@ interface DocType {
   /* 序号 */
   index: number;
   /* 父级目录id */
-  parentId: string
+  parentId: string;
 }
 
-
 // 2. Create a Schema corresponding to the document interface.
-const schema = new Schema<DocType>({
-  name: { type: String, required: true, trim: true },
-  path: { type: String, required: true, trim: true },
-  index: { type: Number, default: 0 },
-  parentId: { type: String, default: "0" } // "0" 表示一级目录
-}, { timestamps: {} });
+const schema = new Schema<DocType>(
+  {
+    name: { type: String, required: true, trim: true },
+    path: { type: String, required: true, trim: true },
+    index: { type: Number, default: 0 },
+    parentId: { type: String, default: "0" }, // "0" 表示一级目录
+  },
+  { timestamps: {} }
+);
 
 const menuModel = model(MODEL_NAME, schema);
 
@@ -28,4 +30,3 @@ const menuModel = model(MODEL_NAME, schema);
 menuModel.syncIndexes();
 
 export default menuModel;
-

@@ -23,7 +23,7 @@ const schema = new Schema<DocType>({
     required: true,
     trim: true,
   },
-  // roles: {type: Array, default: []}
+  roles: [{ type: Schema.Types.ObjectId, ref: 'role' }]
 }, { timestamps: {} });
 
 const userModel = model(MODEL_NAME, schema);

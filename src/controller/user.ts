@@ -1,16 +1,18 @@
 import { Context, Next } from "koa";
 import UserModel from "../database/models/user";
-import { sign, verify } from '../utils/jwt';
-import crypto from 'crypto';   // 加密用的
-import rand from "csprng";  // 生成随机数用的
-import userModel from "../database/models/user";
-import { verifyToken } from '../middleware/auth'
+import MenuModel from "../database/models/menu";
+import { sign, verify } from "../utils/jwt";
+import { isSuperAdmin } from "../utils";
+import crypto from "crypto"; // 加密用的
+import rand from "csprng"; // 生成随机数用的
+import { verifyToken } from "../middleware/auth";
+import { pagingQuery } from "../utils";
 
 const NAME = "用户";
 
 /* 新增 */
 export async function create(ctx: Context, next: Next) {
-  let { username, password } = ctx.request.body;
+  let { username, password, roles } = ctx.request.body;
 
   if (!username || !password) return ctx.fail(`用户名或者密码不能为空`);
 
@@ -22,7 +24,8 @@ export async function create(ctx: Context, next: Next) {
   const user = new UserModel({
     username,
     password,
-    salt
+    roles,
+    salt,
   });
 
   try {
@@ -49,17 +52,23 @@ export async function search(ctx: Context, next: Next) {
   let query: any;
 
   if (_id) {
-    query = UserModel.findById(_id);
-    // docs = await UserModel.findById(_id).where("username").nin(["admin"]);
+    docs = await UserModel.findById(_id);
   } else {
-    query = UserModel.find();
+    docs = await pagingQuery(UserModel, {
+      // $where: function () {
+      //   return this.username !== "admin";
+      // },
+      ...ctx.request.query,
+    });
   }
 
+  console.log(docs);
+
   // 如果不是超级管理员[admin]，则不能查询到admin
-  if (res.data?.username !== 'admin') {
-    query.where("username").nin(["admin"]);
-  }
-  docs = await query.exec();
+  // if (res.data?.username !== "admin") {
+  //   query.where("username").nin(["admin"]);
+  // }
+  // docs = await query.exec();
 
   if (docs) {
     ctx.success(docs, `${NAME}查询成功`);
@@ -70,15 +79,26 @@ export async function search(ctx: Context, next: Next) {
 
 /* 修改 */
 export async function edit(ctx: Context, next: Next) {
-  let { _id, content, title } = ctx.request.body;
+  let { _id, password, username, roles } = ctx.request.body;
 
-  let res = await UserModel.updateOne({
-    _id,
-    title,
-    content,
-  });
+  const updateObj: any = {
+    username,
+    roles,
+  };
 
-  if (res.matchedCount) {
+  // 新的密码
+  if (password) {
+    // 随机生成盐
+    const salt = rand(36, 36);
+
+    updateObj.password = encryptPasswordWithSalt(password, salt);
+
+    updateObj.salt = salt;
+  }
+
+  let res = await UserModel.findByIdAndUpdate(_id, updateObj);
+
+  if (res) {
     ctx.success(null, `${NAME}修改成功`);
   } else {
     ctx.fail(`${NAME}修改失败`);
@@ -105,25 +125,51 @@ export async function login(ctx: Context, next: Next) {
   let { username, password } = ctx.request.body;
 
   let doc = await UserModel.findOne({
-    username
-  });
+    username,
+  })
+    .select("username password salt _id roles")
+    .populate({
+      path: "roles",
+      select: "menus",
+      populate: {
+        path: "menus",
+        select: {
+          createdAt: 0,
+          updatedAt: 0,
+          __v: 0,
+        },
+      },
+    });
 
   if (doc) {
-    let { salt, password: passwordFromDB, ...rest } = doc._doc;
+    let { salt, password: passwordFromDB, roles, ...userInfo } = doc._doc;
 
     // “用户输入的密码进行加密” 和 “数据库查询的密码” 进行比对
     if (passwordFromDB === encryptPasswordWithSalt(password, salt)) {
+      // 判断是否是超级管理员admin
+      if (isSuperAdmin(username)) {
+        // 查询所有目录
+        const menus = await MenuModel.find().select({
+          createdAt: 0,
+          updatedAt: 0,
+          __v: 0,
+        });
+        userInfo.menus = menus;
+      } else {
+        // 根据roles生成menus
+        userInfo.menus = getMenusFromRoles(roles);
+      }
 
       // 将token保存到header返回给前端。
       const token = sign({
-        _id: rest._id,
-        username: rest.username
-      })
+        _id: userInfo._id,
+        username: userInfo.username,
+      });
 
       // 设置token到响应头中
       ctx.response.set("token", token);
 
-      ctx.success(rest, `${NAME}登录成功`);
+      ctx.success(userInfo, `${NAME}登录成功`);
     } else {
       ctx.fail(`密码错误`);
     }
@@ -136,10 +182,6 @@ export async function login(ctx: Context, next: Next) {
 export async function checkLogin(ctx: Context, next: Next) {
   let { token } = ctx.request.body;
 
-  // console.log(token)
-  // if(verify(token)){
-
-  // }
   try {
     const res = verify(token);
     if (res) {
@@ -148,33 +190,73 @@ export async function checkLogin(ctx: Context, next: Next) {
       // 在token的payload.data中存储了该用户的_id，查询以下用户信息
       const { _id } = data;
 
-      const doc = await UserModel.findById(_id);
+      const doc = await UserModel.findById(_id)
+        .select("username password salt _id roles")
+        .populate({
+          path: "roles",
+          select: "menus",
+          populate: {
+            path: "menus",
+            select: {
+              createdAt: 0,
+              updatedAt: 0,
+              __v: 0,
+            },
+          },
+        });
 
       if (doc) {
-        let { salt, password, ...rest } = doc._doc;
+        let { salt, password, roles, ...userInfo } = doc._doc;
+
+        // 判断是否是超级管理员admin
+        if (isSuperAdmin(userInfo.username)) {
+          // 查询所有目录
+          const menus = await MenuModel.find().select({
+            createdAt: 0,
+            updatedAt: 0,
+            __v: 0,
+          });
+          userInfo.menus = menus;
+        } else {
+          // 根据roles生成menus
+          userInfo.menus = getMenusFromRoles(roles);
+        }
 
         // 将token保存到header返回给前端。
-        const token = sign(data)
+        const token = sign(data);
 
         // 设置token到响应头中
         ctx.response.set("token", token);
 
-        ctx.success(rest, "已登录")
-
+        ctx.success(userInfo, "已登录");
       } else {
-        ctx.fail("没有找到token中所对应的用户")
+        ctx.fail("没有找到token中所对应的用户");
       }
     }
   } catch (err: any) {
     // 输出错误信息
-    err.message ? ctx.fail(err.message) : ctx.fail("jwt other err")
+    err.message ? ctx.fail(err.message) : ctx.fail("jwt other err");
   }
-
 }
 
 // 使用盐加密密码
 function encryptPasswordWithSalt(password: string, salt: string) {
-  return crypto.createHash('sha256').update(`${password}${salt}`).digest('hex');
+  return crypto.createHash("sha256").update(`${password}${salt}`).digest("hex");
+}
+
+// 根据用户登录后的角色role数组，拼接成该用户有权访问的menu数组
+function getMenusFromRoles(
+  roles: {
+    menus: any[];
+  }[] = []
+) {
+  const menuSet = new Set();
+  roles.forEach(role => {
+    role.menus.forEach(menu => {
+      menuSet.add(menu);
+    });
+  });
+  return [...menuSet];
 }
 
 export default {
@@ -183,5 +265,5 @@ export default {
   edit,
   remove,
   login,
-  checkLogin
+  checkLogin,
 };

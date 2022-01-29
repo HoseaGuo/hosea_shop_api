@@ -1,8 +1,8 @@
 import { Context, Next } from "koa";
 import ArticleModel from "../database/models/article";
+import { pagingQuery } from "../utils";
 
 export async function search(ctx: Context, next: Next) {
-
   let { _id } = ctx.request.query;
 
   let docs;
@@ -10,7 +10,7 @@ export async function search(ctx: Context, next: Next) {
   if (_id) {
     docs = await ArticleModel.findById(_id);
   } else {
-    docs = await ArticleModel.find();
+    docs = await pagingQuery(ArticleModel, ctx.request.query);
   }
 
   if (docs) {
