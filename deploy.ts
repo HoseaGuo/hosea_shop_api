@@ -52,6 +52,9 @@ async function connectSSH() {
     // id_rsa的路径
     id_rsa_path = path.resolve(USER_HOME, ".ssh/id_rsa");
   }
+
+  console.log("ssh开始连接...");
+
   try {
     await ssh.connect({
       host: "8.134.82.20",
