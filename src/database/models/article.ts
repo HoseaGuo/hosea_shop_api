@@ -1,8 +1,12 @@
 import mongoose, { Schema, model, Model } from "mongoose";
 
 interface DocType {
+  /* 标题 */
   title: string;
+  /* 内容 */
   content: string;
+  /* 阅读数量 */
+  readCount: number;
 }
 
 class Article extends Model {
@@ -38,6 +42,7 @@ const schema = new Schema<DocType, IModel>(
   {
     title: { type: String, required: true },
     content: { type: String, required: true },
+    readCount: { type: Number, default: 0 },
   },
   { timestamps: {} }
 );

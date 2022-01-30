@@ -9,6 +9,11 @@ export async function search(ctx: Context, next: Next) {
 
   if (_id) {
     searchRes = await ArticleModel.findById(_id);
+    if (searchRes) {
+      // 更新文章阅读数量
+      searchRes.readCount++;
+      searchRes.save();
+    }
   } else {
     searchRes = await pagingQuery(ArticleModel, ctx.request.query);
   }

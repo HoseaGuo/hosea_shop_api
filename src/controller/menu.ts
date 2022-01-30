@@ -55,7 +55,6 @@ export async function edit(ctx: Context, next: Next) {
   } catch (e) {
     ctx.fail(`${NAME}修改失败`);
   }
-
 }
 
 async function deleteTreeById(id: string) {
@@ -63,7 +62,7 @@ async function deleteTreeById(id: string) {
   let docs = await MenuModel.find({ parentId: id });
 
   // 递归删除所有子目录
-  await Promise.allSettled(docs.map((doc: any) => deleteTreeById(doc._id)))
+  await Promise.allSettled(docs.map((doc: any) => deleteTreeById(doc._id)));
 
   // 删除本身
   await MenuModel.findByIdAndDelete(id);
@@ -78,14 +77,28 @@ export async function remove(ctx: Context, next: Next) {
 
     if (doc) {
       await deleteTreeById(doc._id);
-      ctx.success(null, `${NAME}删除成功`)
+      ctx.success(null, `${NAME}删除成功`);
     } else {
       ctx.fail(`没有找到该${NAME}`);
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     ctx.fail(`${NAME}删除失败`);
   }
+}
+
+const MENU_CONFIG_PATH = "/backend/system/menu";
+/* 创建后台菜单配置目录，用以给后台可以进行进一步的操作 */
+export function initMenuConfiguration() {
+  MenuModel.findOne({ path: MENU_CONFIG_PATH }, (err: any, doc: any) => {
+    if (!doc) {
+      const menu = new MenuModel({
+        name: "菜单配置",
+        path: "/backend/system/menu",
+      });
+      menu.save();
+    }
+  });
 }
 
 export default {
@@ -93,4 +106,5 @@ export default {
   search,
   edit,
   remove,
+  initMenuConfiguration,
 };

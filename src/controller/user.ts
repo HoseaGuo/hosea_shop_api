@@ -257,6 +257,26 @@ function getMenusFromRoles(
   return [...menuSet];
 }
 
+const DEFAULT_ADMIN_USERNAME = "admin";
+const DEFAULT_ADMIN_PASSWORD = "123456";
+
+export function initSuperAdmin() {
+  UserModel.findOne({ username: DEFAULT_ADMIN_USERNAME }, (err: any, doc: any) => {
+    if (!doc) {
+      // 随机生成盐
+      const salt = rand(36, 36);
+
+      const user = new UserModel({
+        username: DEFAULT_ADMIN_USERNAME,
+        password: encryptPasswordWithSalt(DEFAULT_ADMIN_PASSWORD, salt),
+        salt,
+      });
+
+      user.save();
+    }
+  });
+}
+
 export default {
   create,
   search,
