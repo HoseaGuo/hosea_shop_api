@@ -1,6 +1,6 @@
 import Koa from "koa";
 import koaBody from "koa-body";
-import cors from 'koa2-cors';
+import cors from "koa2-cors";
 import router from "./router/v1";
 import databaseConnect from "./database/connect";
 import responseMiddleware from "./middleware/response";
@@ -12,17 +12,20 @@ function createApp() {
   const app = new Koa();
 
   // 解决跨域问题
-  app.use(cors({
-    credentials: true,
-    origin: function (ctx) {
-      let res: any = false;
-      let { origin } = ctx.request.header;
-      if (origin?.includes('hosea.shop')) {
-        res = '*';
-      }
-      return res;
-    }
-  }));
+  app.use(
+    cors({
+      credentials: true,
+      origin: function (ctx) {
+        let res: any = false;
+        let { origin } = ctx.request.header;
+        if (origin?.includes("hosea.shop")) {
+          res = origin;
+        }
+        return res;
+      },
+      exposeHeaders: ["token"], // 跨域可以拿到token请求头
+    })
+  );
 
   app.use(
     koaBody({
