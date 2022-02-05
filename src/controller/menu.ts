@@ -87,17 +87,22 @@ export async function remove(ctx: Context, next: Next) {
   }
 }
 
-const MENU_CONFIG_PATH = "/backend/system/menu";
+const MENU_CONFIG_PATH = "/management/system/menu";
 /* 创建后台菜单配置目录，用以给后台可以进行进一步的操作 */
 export function initMenuConfiguration() {
   MenuModel.findOne({ path: MENU_CONFIG_PATH }, (err: any, doc: any) => {
     if (!doc) {
       const menu = new MenuModel({
         name: "菜单配置",
-        path: "/backend/system/menu",
+        path: MENU_CONFIG_PATH,
       });
       menu.save();
     }
+    // else {
+    //   console.log("找到了");
+    //   doc.path = "/management/system/menu";
+    //   doc.save();
+    // }
   });
 }
 
