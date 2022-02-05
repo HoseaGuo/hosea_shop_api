@@ -5,8 +5,9 @@ import router from "./router/v1";
 import databaseConnect from "./database/connect";
 import responseMiddleware from "./middleware/response";
 import authMiddleware from "./middleware/auth";
+import config from "../config";
 
-const SERVER_PORT = 9925;
+const SERVER_PORT = config.serverPort;
 
 function createApp() {
   const app = new Koa();

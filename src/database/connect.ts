@@ -2,9 +2,10 @@ import mongoose, { Schema } from "mongoose";
 import updatePlugin from "./plugins/update";
 import { initSuperAdmin } from "../controller/user";
 import { initMenuConfiguration } from "../controller/menu";
+import config from "../../config";
 
 const PORT = 8888;
-const DATABASE_NAME = "hosea";
+const DATABASE_NAME = config.databaseName;
 
 async function connect() {
   // connection Events

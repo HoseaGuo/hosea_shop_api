@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { NodeSSH } from "node-ssh";
 import compressing from "compressing"; // 压缩zip
+import config from "./config";
 
 const ssh = new NodeSSH();
 
@@ -12,7 +13,7 @@ const distPath = "./dist/";
 
 const distZipPath = "dist.zip";
 
-const webDir = "/data/www/hosea/";
+const webDir = config.webDir;
 
 async function buildPackageJson() {
   try {
@@ -74,7 +75,7 @@ async function connectSSH() {
 async function uploadFile(fileName) {
   console.log("开始上传dist压缩文件");
   try {
-    await ssh.putFile(fileName, webDir + fileName);
+    await ssh.putFile(fileName, `${webDir}/${fileName}`);
     console.log("上传dist压缩文件成功");
   } catch (e) {
     console.log(e);
@@ -122,10 +123,10 @@ async function restartServer() {
     await runCommand(`npm i`, `${webDir}/api`);
     console.log("npm包安装结束");
 
-    // 重启pm2项目 api.hosea.com
-    console.log("重启pm2服务");
-    await runCommand(`pm2 restart api.hosea.com`, `${webDir}/api`);
-    console.log("重启pm2结束");
+    // 重启pm2项目 api.hosea.shop
+    // console.log("重启pm2服务");
+    // await runCommand(`pm2 restart app.js`, `${webDir}/api`);
+    // console.log("重启pm2结束");
 
     ssh.dispose(); //断开连接
   } catch (e) {
@@ -155,7 +156,7 @@ const deleteZip = async () => {
 
 async function startDeploy() {
   // 复制文件package.json文件到dist，线上npm安装用
-  await buildPackageJson();
+  // await buildPackageJson();
   // 压缩文件
   await startZip(distPath);
   // 连接服务器
@@ -167,7 +168,7 @@ async function startDeploy() {
   // 解压线上压缩包，并且删除
   await unzipFile();
   // 重新安装npm，重启pm2服务
-  await restartServer();
+  // await restartServer();
 
   console.log("发布项目到线上成功");
   process.exit(0);
