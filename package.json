@@ -13,7 +13,8 @@
     "deploy": "ts-node deploy.ts",
     "dis": "npm run build && npm run deploy",
     "webpack": "npx webpack build",
-    "dis:www": "cross-env KEY=www \"npm run webpack && npm run deploy\""
+    "dis:www": "cross-env KEY=www \"npm run webpack && npm run deploy\"",
+    "dis:test": "cross-env KEY=test \"npm run webpack && npm run deploy\""
   },
   "dependencies": {
     "@koa/router": "^10.1.1",
