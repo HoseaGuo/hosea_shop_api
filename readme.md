@@ -8,7 +8,7 @@
 
 `yarn build`
 
-### 部署到www.hosea.shop
+### 部署到 www.hosea.shop
 
 `yarn dis:www`
 
